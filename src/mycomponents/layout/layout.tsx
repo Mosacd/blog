@@ -4,7 +4,7 @@ import { ThemeProvider } from "../../components/theme-provider"
 const Layout:React.FC = () =>{
 
     return(
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" >
       
       <Header/>
       

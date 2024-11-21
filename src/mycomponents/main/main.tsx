@@ -13,7 +13,7 @@ interface Post {
     tags: string[];
 }
 
-const posts: Post[] = [
+ export const posts: Post[] = [
     {
         id: 1,
         title: "The Future of Blockchain Technology",

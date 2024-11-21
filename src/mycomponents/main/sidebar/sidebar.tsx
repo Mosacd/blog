@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-
+import { Link } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
   const { t } = useTranslation();
@@ -30,10 +30,10 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       <div className="rounded-xl border bg-card text-card-foreground shadow">
-        {/* Popular Tags */}
+        
         
   
-        {/* Featured Authors */}
+      
         <div >
         <div className="flex flex-col space-y-1.5 p-6">
           <div className="font-semibold leading-none tracking-tight">{t('mainpage.featuredauthors')}</div>
@@ -61,7 +61,9 @@ const Sidebar: React.FC = () => {
               },
             ].map((author) => (
               <li key={author.id}>
-                <a className="flex items-center space-x-4 " href={`/author/${author.id}`}>
+                <Link to={`/author/4`} className="flex items-center space-x-4 ">
+               
+                
                   <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full ">
                     <img
                       className="aspect-square h-full w-full"
@@ -69,6 +71,7 @@ const Sidebar: React.FC = () => {
                       src={author.avatar}
                     />
                   </span>
+                  
                   <div>
                     <a
                       className="font-semibold hover:underline"
@@ -78,7 +81,7 @@ const Sidebar: React.FC = () => {
                     </a>
                     <p className="text-sm text-muted-foreground">{author.title}</p>
                   </div>
-                </a>
+                  </Link>
               </li>
             ))}
           </ul>
