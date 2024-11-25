@@ -1,20 +1,24 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { login } from "../../supabase/auth";
 import { useMutation } from "@tanstack/react-query";
 
 const LoginForm: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [logInPayload, setLogInPayload] = useState({ 
     email: "",
     password: "",
   });
 
-  const {mutate:handleLogIn} = useMutation({
+  const {mutate:handleLogIn, isError, error} = useMutation({
     mutationKey: ["register"],
     mutationFn: login,
+    onSuccess: () => {
+      navigate("/")
+    }
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,6 +29,7 @@ const LoginForm: React.FC = () => {
       handleLogIn(logInPayload);
     }
   };
+  console.log(isError,error)
 
   return (
     <div className="w-fit min-h-screen bg-background flex items-center justify-center m-auto">

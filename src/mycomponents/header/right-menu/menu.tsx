@@ -4,18 +4,40 @@ import { ModeToggle } from '../../../components/mode-toggle';
 import { ComboboxDemo } from '../../../components/ui/combobox';
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
-
+import { useAuthContext } from '../../../context/auth/hooks/useAuthContext';
+import { useMutation } from '@tanstack/react-query';
+import { logout } from '../../../supabase/auth/index';
+import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
+import { AvatarFallback } from '../../../components/ui/avatar';
 const Menu: React.FC = () =>{
   const { t } = useTranslation();
+  
+
 const handleChangeLanguage = (lang:string) => {
   i18n.changeLanguage(lang)
 }
+const {user,avatar} = useAuthContext();
 
-
+const{mutate:handleLogout} = useMutation({mutationKey:['logout'], mutationFn:logout})
     return(
         <div className='flex gap-3 '>
+          {user ?(<>
+            <Link to={"/profile"} className="w-10 h-10 border-solid border-blue-800 border-2 rounded p-px" >
+            <Avatar >
+                  <AvatarImage src={avatar} />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                </Link>
+       
+              <button onClick={() => handleLogout()} className='bg-blue-600 text-white'>Logout</button>
+              </>
+          )
+          :(
+            <Link  to="/LoginForm"><button className='bg-blue-600 text-white '>{t("header.sign_in")}</button></Link>
+          )}
+          
           <ComboboxDemo/>
-          <Link  to="/LoginForm"><button className='bg-blue-600 text-white '>{t("header.sign_in")}</button></Link>
+          
           
           <DropdownMenu>
   <DropdownMenuTrigger className="bg-background">
