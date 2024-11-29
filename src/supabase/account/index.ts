@@ -1,8 +1,15 @@
 import { supabase } from "..";
-import { FillProfileInfoPayload } from "./index.types";
+
+type FillProfileInfoPayloadWithId = {
+     phone_number:string;
+     full_name_ka: string;
+     full_name_en: string;
+     avatar_url: string;
+     id?:string;
+ }
 
 
-export const fillProfileInfo = (payload:FillProfileInfoPayload) =>{
+export const fillProfileInfo = (payload:FillProfileInfoPayloadWithId) =>{
 
      return supabase.from("profiles").upsert(payload as any).throwOnError();
 }

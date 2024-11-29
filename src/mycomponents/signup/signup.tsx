@@ -1,34 +1,30 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import {register} from "../../supabase/auth";
+import { register } from "../../supabase/auth";
 
+interface SignUpFormInputs {
+  email: string;
+  password: string;
+}
 
 const SignUpForm: React.FC = () => {
   const { t } = useTranslation();
-  const [registerPayload, setRegisterPayload] = useState({ 
-    email: "",
-    password: "",
+  const {
+    register: formRegister,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormInputs>();
+
+  const { mutate: handleRegister } = useMutation({
+    mutationKey: ["register"],
+    mutationFn: register,
   });
 
-  const {mutate:handleRegister} = useMutation({
-    mutationKey: ["login"],
-    mutationFn: register,
-  })
-
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { id, value } = e.target;
-  //   setRegisterPayload({ ...registerPayload, [id]: value });
-  // };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const isEmailField = !!registerPayload.email;
-    const isPasswordField = !!registerPayload.password;
-    if (isEmailField && isPasswordField){
-      handleRegister(registerPayload);
-    }
+  const onSubmit: SubmitHandler<SignUpFormInputs> = (data) => {
+    handleRegister(data);
   };
 
   return (
@@ -44,9 +40,8 @@ const SignUpForm: React.FC = () => {
         </div>
 
         <div className="p-6 pt-0">
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            
-
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            {/* Email Field */}
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -57,20 +52,21 @@ const SignUpForm: React.FC = () => {
               <input
                 type="email"
                 id="email"
-                name="email"
-                placeholder="john@example.com"
-                required
-                value={registerPayload.email}
-                onChange={(e) => {
-                  setRegisterPayload({
-                    email: e.target.value,
-                    password: registerPayload.password,
-                  });
-                }}
+                {...formRegister("email", {
+                  required: t("signup.validation.required"),
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: t("signup.validation.invalid_email_format"),
+                  },
+                })}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
             </div>
 
+            {/* Password Field */}
             <div className="space-y-2">
               <label
                 htmlFor="password"
@@ -81,21 +77,25 @@ const SignUpForm: React.FC = () => {
               <input
                 type="password"
                 id="password"
-                name="password"
-                required
-                value={registerPayload.password}
-                onChange={(e) => {
-                  setRegisterPayload({
-                    email: registerPayload.email,
-                    password: e.target.value,
-                  });
-                }}
+                {...formRegister("password", {
+                  required: t("signup.validation.required"),
+                  minLength: {
+                    value: 6,
+                    message: t("signup.validation.min_length", { count: 6 }),
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: t("signup.validation.max_length", { count: 20 }),
+                  },
+                })}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password.message}</p>
+              )}
             </div>
 
-            
-
+            {/* Submit Button */}
             <button
               type="submit"
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full"

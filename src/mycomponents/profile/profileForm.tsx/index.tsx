@@ -1,16 +1,23 @@
 import { FillProfileInfoPayload } from "@/supabase/account/index.types";
-import { Dispatch } from "react";
-import { SetStateAction } from "react";
+// import { Dispatch } from "react";
+// import { SetStateAction } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
-const ProfileForm: React.FC<{ onFormSubmit: (e: React.FormEvent) => void,
+const ProfileForm: React.FC<{ onFormSubmit: (fieldvalues:FillProfileInfoPayload) => void,
      profilePayload:FillProfileInfoPayload,
-     setProfilePayload: Dispatch<SetStateAction<FillProfileInfoPayload>>
- }> = ({ onFormSubmit, profilePayload, setProfilePayload }) => {
+     /*setProfilePayload: Dispatch<SetStateAction<FillProfileInfoPayload>>*/
+ }> = ({ onFormSubmit, profilePayload, /*setProfilePayload*/ }) => {
 
+  const { t } = useTranslation();
+
+  const { register, handleSubmit, formState: { errors }, } = useForm<FillProfileInfoPayload>({
+    defaultValues: profilePayload,
+  });
 
     return(
 <div className="p-6 pt-0">
-        <form className="space-y-4" onSubmit={onFormSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit(onFormSubmit)}>
           
 
           <div className="space-y-2">
@@ -18,50 +25,35 @@ const ProfileForm: React.FC<{ onFormSubmit: (e: React.FormEvent) => void,
               htmlFor="email"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Full  Name En
+              {t("profileForm.fullNameEn")}
             </label>
             <input
              
               id="fullNameEn"
-              name="fullNameEn"
-              placeholder=""
-              required
-              value={profilePayload.full_name_en}
-              onChange={(e) => {
-                setProfilePayload({
-                  phone_number: profilePayload.phone_number,
-                    avatar_url: profilePayload.avatar_url,
-                    full_name_en: e.target.value,
-                    full_name_ka: profilePayload.full_name_ka,
-                  });
-              }}
+              {...register("full_name_en", { required: t("profileForm.validation.required") })}
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
+            {errors.full_name_en && (
+            <p className="text-sm text-red-500">{errors.full_name_en.message}</p>
+          )}
           </div>
-
+            
           <div className="space-y-2">
             <label
               htmlFor="fullNameKa"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-             Full Name Ka
+             {t("profileForm.fullNameKa")}
             </label>
             <input
              
               id="fullNameKa"
-              name="fullNameKa"
-              required
-              value={profilePayload.full_name_ka}
-              onChange={(e) => {
-                setProfilePayload({
-                    phone_number: profilePayload.phone_number,
-                    avatar_url: profilePayload.avatar_url,
-                    full_name_en: profilePayload.full_name_en,
-                    full_name_ka: e.target.value,
-                  });
-              }}
+              {...register("full_name_ka", { required: t("profileForm.validation.required") })}
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
+            {errors.full_name_ka && (
+            <p className="text-sm text-red-500">{errors.full_name_ka.message}</p>
+          )}
           </div>
 
           <div className="space-y-2">
@@ -69,25 +61,17 @@ const ProfileForm: React.FC<{ onFormSubmit: (e: React.FormEvent) => void,
               htmlFor="avatarUrl"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Avatar Url
+              {t("profileForm.AvatarURL")}
             </label>
             <input
                 type= "url"
               id="avatarUrl"
-              name="avatarUrl"
-              placeholder=""
-              required
-              value={profilePayload.avatar_url}
-              onChange={(e) => {
-                setProfilePayload({
-                  phone_number: profilePayload.phone_number,
-                    avatar_url: e.target.value,
-                    full_name_en: profilePayload.full_name_en,
-                    full_name_ka: profilePayload.full_name_ka,
-                  });
-              }}
+            {...register("avatar_url")}
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
+            {errors.avatar_url && (
+            <p className="text-sm text-red-500">{errors.avatar_url.message}</p>
+          )}
           </div>
 
 
@@ -97,32 +81,28 @@ const ProfileForm: React.FC<{ onFormSubmit: (e: React.FormEvent) => void,
               htmlFor="phoneNumber"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Phone Number
+             {t("profileForm.phoneNum")}
             </label>
             <input
             
               id="phoneNumber"
-              name="phoneNumber"
-              placeholder=""
-              required
-              value={profilePayload.phone_number}
-              onChange={(e) => {
-                setProfilePayload({
-                  phone_number: e.target.value,
-                  avatar_url: profilePayload.avatar_url,
-                  full_name_en: profilePayload.full_name_en,
-                  full_name_ka: profilePayload.full_name_ka,
-                });
-              }}
+              {...register("phone_number", {
+                required: t("This field is required"),
+                minLength: { value: 10, message: t("Minimum length is 10 digits") },
+                maxLength: { value: 15, message: t("Maximum length is 15 digits") },
+              })}
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
+            {errors.phone_number && (
+            <p className="text-sm text-red-500">{errors.phone_number.message}</p>
+          )}
           </div>
 
           <button
             type="submit"
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full"
           >
-            Submit
+            {t("Submit")}
           </button>
         </form>
       </div>

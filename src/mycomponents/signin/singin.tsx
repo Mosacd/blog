@@ -1,35 +1,36 @@
-import React, { useState } from "react";
+import React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { login } from "../../supabase/auth";
 import { useMutation } from "@tanstack/react-query";
 
+interface LoginFormInputs {
+  email: string;
+  password: string;
+}
+
 const LoginForm: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [logInPayload, setLogInPayload] = useState({ 
-    email: "",
-    password: "",
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>();
 
-  const {mutate:handleLogIn, isError, error} = useMutation({
-    mutationKey: ["register"],
+  const { mutate: handleLogIn, /*isError, error */ } = useMutation({
+    mutationKey: ["login"],
     mutationFn: login,
     onSuccess: () => {
-      navigate("/")
-    }
-  })
+      navigate("/");
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const isEmailField = !!logInPayload.email;
-    const isPasswordField = !!logInPayload.password;
-    if (isEmailField && isPasswordField){
-      handleLogIn(logInPayload);
-    }
+  const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
+    handleLogIn(data);
   };
-  console.log(isError,error)
 
   return (
     <div className="w-fit min-h-screen bg-background flex items-center justify-center m-auto">
@@ -44,7 +45,8 @@ const LoginForm: React.FC = () => {
         </div>
 
         <div className="p-6 pt-0">
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            {/* Email Field */}
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -53,20 +55,25 @@ const LoginForm: React.FC = () => {
                 {t("signin.email_label")}
               </label>
               <input
+                formNoValidate
                 type="email"
                 id="email"
-                name="email"
                 placeholder="john@example.com"
-                required
-                value={logInPayload.email}
-                onChange={(e) => setLogInPayload({
-                  email: e.target.value,
-                  password: logInPayload.password,
-                })}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                {...register("email", {
+                  required: t("signin.validation.required"),
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: t("signin.validation.invalid_email_format"),
+                  },
+                })}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
+            {/* Password Field */}
             <div className="space-y-2">
               <label
                 htmlFor="password"
@@ -77,17 +84,25 @@ const LoginForm: React.FC = () => {
               <input
                 type="password"
                 id="password"
-                name="password"
-                required
-                value={logInPayload.password}
-                onChange={(e) => setLogInPayload({
-                  email: logInPayload.email,
-                  password: e.target.value,
-                })}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                {...register("password", {
+                  required: t("signin.validation.required"),
+                  minLength: {
+                    value: 6,
+                    message: t("signin.validation.min_length", { count: 6 }),
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: t("signin.validation.max_length", { count: 20 }),
+                  },
+                })}
               />
+              {errors.password && (
+                <p className="text-sm text-red-500">{errors.password.message}</p>
+              )}
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full"

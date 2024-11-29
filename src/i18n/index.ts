@@ -8,7 +8,6 @@
         en: {
       translation: {
 
-        
             "signin": {
                 "title": "Log in to BitBlogs",
                 "description": "Enter your credentials to access your account",
@@ -17,7 +16,13 @@
                 "submit_button": "Log In",
                 "forgot_password": "Forgot password?",
                 "no_account": "Don't have an account?",
-                "signup_link": "Sign up"
+                "signup_link": "Sign up",
+                "validation":{
+                    "required": "required field",
+                    "invalid_email_format": "invalid email format",
+                    "min_length": "min length {{count}}",
+                    "max_length": "max length {{count}}",
+                }
             },
             "signup": {
                 "title": "Sign Up for BitBlogs",
@@ -28,7 +33,13 @@
                 "confirm_password_label": "Confirm Password",
                 "submit_button": "Sign Up",
                 "already_have_account": "Already have an account?",
-                "login_link": "Log in"
+                "login_link": "Log in",
+                "validation":{
+                    "required": "required field",
+                    "invalid_email_format": "invalid email format",
+                    "min_length": "min length {{count}}",
+                    "max_length": "max length {{count}}",
+                }
             },
             "header": {
                 "logo": "BitBlogs",
@@ -48,10 +59,19 @@
                     "readTime": "Read Time",
                     "populartags": "Popular Tags",
                 "featuredauthors": "Featured Aiuthors"
+            },
+            "profileForm":{
+                "fullNameEn": "Full Name (English)",
+                "fullNameKa": "Full Name (Georgian)",
+                "phoneNum": "Phone Number",
+                "AvatarURL":"Avatar URL",
+                "validation": { 
+                    "required": "required field",
+                    "min_length": "min length {{count}}",
+                    "max_length": "max length {{count}}",
+                }
             }
-            
-      
-    }
+        }
     },
     ka: {
       translation: {
@@ -63,7 +83,13 @@
                 "submit_button": "შესვლა",
                 "forgot_password": "დაგავიწყდათ პაროლი?",
                 "no_account": "არ გაქვთ ანგარიში?",
-                "signup_link": "რეგისტრაცია"
+                "signup_link": "რეგისტრაცია",
+                "validation":{
+                    "required": "საჭირო ველი",
+                    "invalid_email_format": "ელფოსტის არასწორი ფორმატი",
+                    "min_length": "min length {{count}}",
+                    "max_length": "max length {{count}}",
+                }
             },
             "signup": {
                 "title": "დარეგისტრირდი BitBlogs-ში",
@@ -74,7 +100,13 @@
                 "confirm_password_label": "დაადასტურე პაროლი",
                 "submit_button": "რეგისტრაცია",
                 "already_have_account": "უკვე გაქვთ ანგარიში?",
-                "login_link": "შესვლა"
+                "login_link": "შესვლა",
+                "validation":{
+                    "required": "საჭირო ველი",
+                    "invalid_email_format": "ელფოსტის არასწორი ფორმატი",
+                    "min_length": "min length {{count}}",
+                    "max_length": "max length {{count}}",
+                }
             },
             "header": {
                 "logo": "BitBlogs",
@@ -94,7 +126,18 @@
                 "readTime": "კითხვის დრო",
                 "populartags": "პოპულარული ტეგები",
                 "featuredauthors": "გამორჩეული ავტორები"
-
+            },
+            "profileForm":{
+                "fullNameEn": "სრული სახელი (ინგლისური)",
+                "fullNameKa": "სრული სახელი (ქართული)",
+                "phoneNum": "ტელეფონის ნომერი",
+                "AvatarURL":"ავატარის URL",
+                "validation": { 
+                    "required": "საჭირო ველი",
+                    "min_length": "min length {{count}}",
+                    "max_length": "max length {{count}}",
+                    
+                }
             }
       },
      },

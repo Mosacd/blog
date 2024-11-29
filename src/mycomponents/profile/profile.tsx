@@ -10,7 +10,7 @@ const Profile:React.FC = () =>{
     
     const {user, handleSetAvatar} = useAuthContext();
 
-  const [profilePayload, setProfilePayload] = useState<FillProfileInfoPayload>({
+  const [profilePayload,setProfilePayload] = useState<FillProfileInfoPayload>({
     avatar_url: "",
     full_name_en: "",
     full_name_ka: "",
@@ -37,9 +37,9 @@ const Profile:React.FC = () =>{
   })
 
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-      handleFillProfileInfo({...profilePayload, id: user?.user?.id });
+  const handleSubmit = (fieldvalues:FillProfileInfoPayload) => {
+    console.log(fieldvalues)
+      handleFillProfileInfo({...fieldvalues, id: user?.user?.id });
   };
 
   const [isEditing, setIsEditing] = useState(false);
@@ -47,6 +47,8 @@ const Profile:React.FC = () =>{
   useEffect(() => {
     if (user) {
       getProfileInfo(user.user.id).then((res) => {
+        console.log(user);
+        console.log(user.user.id);
         if ( res?.data && Array.isArray(res.data) && res?.data?.length > 0) {
 
           const { avatar_url, full_name_ka, full_name_en, phone_number } = res.data[0];
@@ -54,12 +56,12 @@ const Profile:React.FC = () =>{
 
           handleSetAvatar(avatar_url);
       
-          setProfilePayload({
-            avatar_url: avatar_url || "",
-            full_name_en: full_name_en || "",
+           setProfilePayload({
+             avatar_url: avatar_url || "",
+             full_name_en: full_name_en || "",
             full_name_ka: full_name_ka || "",
             phone_number: phone_number || "",
-          });
+           });
         } else {
           console.warn("No data available");
         }
@@ -73,7 +75,7 @@ const Profile:React.FC = () =>{
       <>
        <div className="p-6">
       {isEditing ? (
-        <ProfileForm onFormSubmit = {handleSubmit} profilePayload = {profilePayload} setProfilePayload ={setProfilePayload} />
+        <ProfileForm onFormSubmit = {handleSubmit} profilePayload = {profilePayload} /*setProfilePayload ={setProfilePayload}*/ />
       ) : (
         <div className="space-y-4">
           
