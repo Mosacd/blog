@@ -1,8 +1,18 @@
-import { posts } from "../../main/main";
+
 import { useTranslation } from "react-i18next";
+
+
 
 const AuthorAccount = () =>{
 
+    const posts = [{id: 1,
+        title: "The Future of Blockchain Technology",
+        image: "https://g-zwkebgiacpe.vusercontent.net/placeholder.svg?height=200&width=400",
+        author: "John Doe",
+        date: "May 15, 2023",
+        readTime: "5 min read",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        tags: ["Blockchain", "Technology", "Future"],}]
     const { t } = useTranslation();
 
 return(

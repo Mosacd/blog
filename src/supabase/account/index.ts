@@ -9,7 +9,7 @@ type FillProfileInfoPayloadWithId = {
  }
 
 
-export const fillProfileInfo = (payload:FillProfileInfoPayloadWithId) =>{
+export const fillProfileInfo = async (payload:FillProfileInfoPayloadWithId) =>{
 
      return supabase.from("profiles").upsert(payload as any).throwOnError();
 }

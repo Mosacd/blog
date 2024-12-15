@@ -61,15 +61,15 @@ const LoginForm: React.FC = () => {
                 placeholder="john@example.com"
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 {...register("email", {
-                  required: t("signin.validation.required"),
+                  required: "signin.validation.required",
                   pattern: {
                     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: t("signin.validation.invalid_email_format"),
+                    message: "signin.validation.invalid_email_format",
                   },
                 })}
               />
               {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
+                <p className="text-sm text-red-500">{t("errors.email.message")}</p>
               )}
             </div>
 
@@ -86,19 +86,19 @@ const LoginForm: React.FC = () => {
                 id="password"
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 {...register("password", {
-                  required: t("signin.validation.required"),
+                  required:"signin.validation.required",
                   minLength: {
                     value: 6,
-                    message: t("signin.validation.min_length", { count: 6 }),
+                    message:"signin.validation.min_length",
                   },
                   maxLength: {
                     value: 20,
-                    message: t("signin.validation.max_length", { count: 20 }),
+                    message:"signin.validation.max_length",
                   },
                 })}
               />
               {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
+                <p className="text-sm text-red-500">{t("errors.password.message")}</p>
               )}
             </div>
 
