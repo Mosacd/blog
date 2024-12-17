@@ -1,6 +1,10 @@
 import { supabase } from "..";
 
 
+export type BlogsFilterValueTypes = {
+    searchText: string;
+}
+
 export type Blog = {
      created_at: string;
      id: number;
@@ -18,4 +22,13 @@ export const getBlogsList = async (): Promise<Blog[]> => {
      }
      return data || [];
  };
+
+ export const getFilteredBlogsList = async (searchFormValues: BlogsFilterValueTypes): Promise<Blog[]> => {
+    const { data, error } = await supabase.from('blogs').select('*').ilike("title", `%${searchFormValues?.searchText}%`);
+    if (error) {
+        console.error('Error fetching blogs:', error.message);
+        return [];
+    }
+    return data || [];
+};
  

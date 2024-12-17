@@ -1,13 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Sidebar from "./sidebar/sidebar";
 import { useTranslation } from "react-i18next";
-import { getBlogsList } from "../../supabase/blogsList";
-import { Blog } from "../../supabase/blogsList";
+import { getBlogsList, getFilteredBlogsList } from "../../supabase/blogsList";
+import { Blog, BlogsFilterValueTypes } from "../../supabase/blogsList";
+import { Controller, useForm } from "react-hook-form";
+import { Input } from "../../components/ui/input";
+import underscore from "underscore";
 
+
+const blogsFilterDefaultValues = {
+    searchText: "",
+}
 const MainPage: React.FC = () => {
     const { t } = useTranslation();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+     const { control, watch } = useForm<BlogsFilterValueTypes>({
+        defaultValues: blogsFilterDefaultValues
+      });
+      
+      const didMountRef = useRef(false); // Ref to track component mount status
 
     useEffect(() => {
         getBlogsList().then((res) => {
@@ -18,14 +30,73 @@ const MainPage: React.FC = () => {
         });
     }, []);
 
-    if (isLoading) {
-        return <p>{t('mainpage.loading')}</p>;
+  
+
+//    const onSubmit = (searchFormValues: BlogsFilterValueTypes) => {
+//     setIsLoading(true);
+//     getFilteredBlogsList(searchFormValues).then(res => {
+//         const blogsList = Array.isArray(res) ? res : [];
+//         setBlogs(blogsList);
+//         setIsLoading(false);
+//     })
+//    }
+
+const watchedSearchText = watch("searchText");
+
+
+const fetchBlogsList = useCallback(
+    underscore.debounce((searchValue:string) => {
+      console.log("Fetching for:", searchValue); // Debugging
+   
+      getFilteredBlogsList({ searchText: searchValue }).then((res) => {
+        const blogsList = Array.isArray(res) ? res : [];
+        setBlogs(blogsList);
+
+      });
+    }, 1000),
+    [] // Dependencies (empty for debounce)
+  );
+  
+useEffect(() =>{
+    if(didMountRef.current){
+        fetchBlogsList(watchedSearchText);
+    } else{
+        didMountRef.current = true;
     }
+
+}, [watchedSearchText,fetchBlogsList])
+
+
+if (isLoading) {
+    return <p>{t('mainpage.loading')}</p>;
+}
 
     return (
         <main className="px-4 py-8 flex-grow">
             <div className="container mx-auto flex flex-col md:flex-row gap-8">
                 <section className="md:w-2/3 space-y-8 flex flex-col">
+                <div className="space-y-2">
+                <label
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  htmlFor="title"
+                >
+                  Filter
+                </label>
+                <Controller
+                  name="searchText"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                      id="title"
+                      placeholder="Enter saerch text..."
+                      required
+                     
+                    />
+                  )}
+                />
+              </div>
                     {blogs.map((blog) => {
                        
                         const blogImageUrl = blog?.image_url
