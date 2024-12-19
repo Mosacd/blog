@@ -1,33 +1,58 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Sidebar from "./sidebar/sidebar";
 import { useTranslation } from "react-i18next";
-import { getBlogsList, getFilteredBlogsList } from "../../supabase/blogsList";
+import { getFilteredBlogsList } from "../../supabase/blogsList";
 import { Blog, BlogsFilterValueTypes } from "../../supabase/blogsList";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "../../components/ui/input";
 import underscore from "underscore";
+import { useSearchParams } from "react-router-dom";
+import qs from 'qs';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-
-const blogsFilterDefaultValues = {
-    searchText: "",
-}
+dayjs.extend(relativeTime);
+// const blogsFilterDefaultValues = {
+//     searchText: "",
+// }
 const MainPage: React.FC = () => {
     const { t } = useTranslation();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const parsedQueryParams = qs.parse(searchParams.toString());
+   
      const { control, watch } = useForm<BlogsFilterValueTypes>({
-        defaultValues: blogsFilterDefaultValues
+        defaultValues: {
+            searchText: parsedQueryParams?.searchedtext?.toString()
+        }
       });
+
+
+
+    
+   
       
       const didMountRef = useRef(false); // Ref to track component mount status
 
     useEffect(() => {
-        getBlogsList().then((res) => {
+        const parsedSearchParams = qs.parse(searchParams.toString());
+        const searchedtext = parsedSearchParams?.searchedtext;
+        console.log(searchedtext);
+        // getBlogsList().then((res) => {
+        //     const blogsList = Array.isArray(res) ? res : [];
+        //     setBlogs(blogsList);
+        //     setIsLoading(false);
+        //     console.log(blogsList);
+
+            
+        // });
+
+        getFilteredBlogsList({ searchText: searchedtext?.toString() || ""}).then((res) => {
             const blogsList = Array.isArray(res) ? res : [];
             setBlogs(blogsList);
             setIsLoading(false);
-            console.log(blogsList);
-        });
+          });
     }, []);
 
   
@@ -41,7 +66,8 @@ const MainPage: React.FC = () => {
 //     })
 //    }
 
-const watchedSearchText = watch("searchText");
+const watchedSearchText = watch("searchText") || "";
+const searchedtext = watchedSearchText;
 
 
 const fetchBlogsList = useCallback(
@@ -60,6 +86,12 @@ const fetchBlogsList = useCallback(
 useEffect(() =>{
     if(didMountRef.current){
         fetchBlogsList(watchedSearchText);
+        setSearchParams( qs.stringify({searchedtext},{skipNulls: true, filter: (_, value) =>
+            {
+                return value || undefined;
+            },
+         }),
+        );
     } else{
         didMountRef.current = true;
     }
@@ -103,6 +135,12 @@ if (isLoading) {
                             ? `${import.meta.env.VITE_SUPABASE_BLOG_IMAGES_STORAGE_URL}/blog_images/${blog?.image_url}`
                             : "https://pkdqnffhfhajyeiqgkci.supabase.co/storage/v1/object/public/blog_images/grubber_storm_king_4k_5k_hd_my_little_pony_the_movie.jpg";
                         console.log(blogImageUrl)
+
+                        const creationDate = dayjs(blog.created_at);
+                        const formattedDate = creationDate.isAfter(dayjs().subtract(1, "day"))
+                        ? creationDate.fromNow() // "x hours ago" or "x minutes ago"
+                        : creationDate.format("HH:mm - DD/MM/YYYY");
+
                         return (
                             <a href={`/posts/${blog.id}`} key={blog.id}>
                                 <div className="rounded-xl border bg-card text-card-foreground shadow">
@@ -122,7 +160,7 @@ if (isLoading) {
                                                 {t('mainpage.author')}: {blog.user_id}
                                             </a>
                                             <span>•</span>
-                                            <span>{t('mainpage.date')}: {new Date(blog.created_at).toLocaleDateString()}</span>
+                                            <span>{t('mainpage.date')}: {formattedDate}</span>
                                         </div>
                                     </div>
                                     <div className="p-6 pt-0">

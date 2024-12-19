@@ -14,14 +14,14 @@ export type Blog = {
      user_id:string | null;
  }
 
-export const getBlogsList = async (): Promise<Blog[]> => {
-     const { data, error } = await supabase.from('blogs').select('*');
-     if (error) {
-         console.error('Error fetching blogs:', error.message);
-         return [];
-     }
-     return data || [];
- };
+// export const getBlogsList = async (): Promise<Blog[]> => {
+//      const { data, error } = await supabase.from('blogs').select('*');
+//      if (error) {
+//          console.error('Error fetching blogs:', error.message);
+//          return [];
+//      }
+//      return data || [];
+//  };
 
  export const getFilteredBlogsList = async (searchFormValues: BlogsFilterValueTypes): Promise<Blog[]> => {
     const { data, error } = await supabase.from('blogs').select('*').ilike("title", `%${searchFormValues?.searchText}%`);
