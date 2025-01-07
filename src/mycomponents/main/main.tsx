@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./sidebar/sidebar";
 import { useTranslation } from "react-i18next";
-import { getFilteredBlogsList } from "../../supabase/blogsList";
 import { Blog, BlogsFilterValueTypes } from "../../supabase/blogsList";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "../../components/ui/input";
@@ -10,7 +9,7 @@ import { useSearchParams } from "react-router-dom";
 import qs from "qs";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useQuery } from "@tanstack/react-query";
+import { useGetBlogsList } from "../../reactQuery/query/blog";
 
 dayjs.extend(relativeTime);
 
@@ -43,13 +42,24 @@ const MainPage: React.FC = () => {
   }, [watchedSearchText]);
 
   
-  const { data: blogs = [], isLoading } = useQuery<Blog[]>(
-    ["blogs", debouncedSearchText],
-    () => getFilteredBlogsList({ searchText: debouncedSearchText }),
- {
-    refetchOnWindowFocus: false,
+ const formatDate = (created_at:string) => {
+    const creationDate = dayjs(created_at);
+    const formattedDate = creationDate.isAfter(dayjs().subtract(1, "day"))
+              ? creationDate.fromNow()
+              : creationDate.format("HH:mm - DD/MM/YYYY");
+              return formattedDate;
  }
-  );
+
+   const mapBlogsList = (data: Blog[]) => {
+    return data.map((blog) => ({
+      ...blog,
+      created_at: formatDate(blog.created_at),
+    }));
+  };
+
+  const { data: blogs = [], isLoading } = useGetBlogsList({ queryOptions: { select: mapBlogsList ,refetchOnWindowFocus: false } }, debouncedSearchText);
+  
+  
 
   // Update query parameters
   useEffect(() => {
@@ -67,13 +77,7 @@ const MainPage: React.FC = () => {
     return <p>{t("mainpage.loading")}</p>;
   }
 
- const formatDate = (created_at:string) => {
-    const creationDate = dayjs(created_at);
-    const formattedDate = creationDate.isAfter(dayjs().subtract(1, "day"))
-              ? creationDate.fromNow()
-              : creationDate.format("HH:mm - DD/MM/YYYY");
-              return formattedDate;
- }
+
 
   console.log("rerender");
   return (
@@ -106,7 +110,7 @@ const MainPage: React.FC = () => {
               ? `${import.meta.env.VITE_SUPABASE_BLOG_IMAGES_STORAGE_URL}/blog_images/${blog?.image_url}`
               : "https://pkdqnffhfhajyeiqgkci.supabase.co/storage/v1/object/public/blog_images/grubber_storm_king_4k_5k_hd_my_little_pony_the_movie.jpg";
 
-            const  formattedDate  = formatDate(blog.created_at);
+        
 
             return (
               <a href={`/posts/${blog.id}`} key={blog.id}>
@@ -127,7 +131,7 @@ const MainPage: React.FC = () => {
                         {t("mainpage.author")}: {blog.user_id}
                       </a>
                       <span>•</span>
-                      <span>{t("mainpage.date")}: {formattedDate}</span>
+                      <span>{t("mainpage.date")}: {blog.created_at}</span>
                     </div>
                   </div>
                   <div className="p-6 pt-0">

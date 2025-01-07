@@ -29,6 +29,6 @@ export type Blog = {
         console.error('Error fetching blogs:', error.message);
         return [];
     }
-    return data || [];
+    return data;
 };
  

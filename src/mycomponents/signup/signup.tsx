@@ -2,8 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { register } from "../../supabase/auth";
+import { useSignUp } from "../../reactQuery/mutation/auth";
 
 interface SignUpFormInputs {
   email: string;
@@ -18,19 +17,21 @@ const SignUpForm: React.FC = () => {
     formState: { errors },
   } = useForm<SignUpFormInputs>();
 
-  const { mutate: handleRegister } = useMutation({
-    mutationKey: ["register"],
-    mutationFn: register,
-  });
+  const { mutate: register, isError, error, isPending } = useSignUp();
+  
+
 
   const onSubmit: SubmitHandler<SignUpFormInputs> = (data) => {
-    handleRegister(data);
+    register(data);
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="rounded-xl border bg-card text-card-foreground shadow w-full max-w-md">
         <div className="flex flex-col space-y-1.5 p-6">
+        {isPending && (
+        <h1 className="m-auto text-center text-lg">Signing you up...</h1>
+      )}
           <div className="tracking-tight text-2xl font-bold text-center">
             {t("signup.title")}
           </div>
@@ -104,6 +105,7 @@ const SignUpForm: React.FC = () => {
             </button>
           </form>
         </div>
+        {isError && <p className="text-red-500">Sign Up failed: {String(error)}</p>}
 
         <div className="items-center p-6 pt-0 flex justify-center">
           <p className="text-sm text-muted-foreground">

@@ -1,73 +1,36 @@
-import { FillProfileInfoPayload } from "@/supabase/account/index.types";
-import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { fillProfileInfo, getProfileInfo } from "../../supabase/account";
+import { FillProfileInfoPayload } from "../../supabase/account/index.types";
+import { useState } from "react";
+import { mapProfileTableData } from "../../supabase/account";
 import { useAuthContext } from "../../context/auth/hooks/useAuthContext";
 import ProfileForm from "./profileForm.tsx";
+import { useGetProfileInfo } from "../../reactQuery/query/profile/index.ts";
+import { useFillProfile } from "../../reactQuery/mutation/profile/index.ts";
 
 
 const Profile:React.FC = () =>{
     
     const {user, handleSetAvatar} = useAuthContext();
 
-  const [profilePayload,setProfilePayload] = useState<FillProfileInfoPayload>({
-    avatar_url: "",
-    full_name_en: "",
-    full_name_ka: "",
-    phone_number: "",
-  });
-  
-  // useEffect(() =>{
-  //   if(user){
-  //     getProfileInfo(user?.user.id).then(res => console.log(res))
-  //   }
-    
-  // },[user])
-
-  const {mutate: handleFillProfileInfo} = useMutation({
-    mutationKey: ["fill-profile-info"],
-    mutationFn: fillProfileInfo,
-    onSuccess: () => {
-      setIsEditing(false);
-      console.log("Profile updated successfully!");
-    },
-    onError: (error: any) => {
-      console.log(`Error updating profile: ${error.message}`);
-    },
-  })
-
-
-  const handleSubmit = (fieldvalues:FillProfileInfoPayload) => {
-    console.log(fieldvalues)
-      handleFillProfileInfo({...fieldvalues, id: user?.user?.id });
-  };
-
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      getProfileInfo(user.user.id).then((res) => {
-        console.log(user);
-        console.log(user.user.id);
-        if ( res?.data && Array.isArray(res.data) && res?.data?.length > 0) {
+  const {mutate:fillProfileInfo} = useFillProfile(setIsEditing,isEditing)
 
-          const { avatar_url, full_name_ka, full_name_en, phone_number } = res.data[0];
-          console.log({ avatar_url, full_name_ka, full_name_en, phone_number });
-
-          handleSetAvatar(avatar_url);
-      
-           setProfilePayload({
-             avatar_url: avatar_url || "",
-             full_name_en: full_name_en || "",
-            full_name_ka: full_name_ka || "",
-            phone_number: phone_number || "",
-           });
-        } else {
-          console.warn("No data available");
-        }
-      });
+  const handleSubmit = (fieldvalues:FillProfileInfoPayload) => {
+    if (!user?.user?.id) {
+      console.error("ID is undefined");
+      return;
     }
-  }, [user]);
+    fillProfileInfo({values:fieldvalues, id:user?.user?.id});
+  };
+
+
+
+
+  const {data: profileData = { avatar_url: "",
+    full_name_en: "",
+    full_name_ka: "",
+    phone_number: "",}} = useGetProfileInfo({ queryOptions: { select: mapProfileTableData } }, user?.user?.id);
+
   
 
     return(
@@ -75,14 +38,14 @@ const Profile:React.FC = () =>{
       <>
        <div className="p-6">
       {isEditing ? (
-        <ProfileForm onFormSubmit = {handleSubmit} profilePayload = {profilePayload} /*setProfilePayload ={setProfilePayload}*/ />
+        <ProfileForm onFormSubmit = {handleSubmit} profilePayload = {profileData} /*setProfilePayload ={setProfilePayload}*/ />
       ) : (
         <div className="space-y-4">
           
         
             <div className="flex justify-center">
               <img
-                src={profilePayload.avatar_url}
+                src={profileData.avatar_url}
                 alt="Avatar"
                 className="h-24 w-24 rounded-full border object-cover"
               />
@@ -92,13 +55,13 @@ const Profile:React.FC = () =>{
           
           <div className="flex flex-col gap-1 space-y-2">
             <div>
-              <strong>Full Name (English):</strong> {profilePayload.full_name_en || "Not provided"}
+              <strong>Full Name (English):</strong> {profileData.full_name_en || "Not provided"}
             </div>
             <div>
-              <strong>Full Name (Georgian):</strong> {profilePayload.full_name_ka || "Not provided"}
+              <strong>Full Name (Georgian):</strong> {profileData.full_name_ka || "Not provided"}
             </div>
             <div>
-              <strong>Phone Number:</strong> {profilePayload.phone_number || "Not provided"}
+              <strong>Phone Number:</strong> {profileData.phone_number || "Not provided"}
             </div>
           </div>
 

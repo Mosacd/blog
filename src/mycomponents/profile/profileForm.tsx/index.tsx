@@ -1,4 +1,4 @@
-import { FillProfileInfoPayload } from "@/supabase/account/index.types";
+import { FillProfileInfoPayload } from "../../../supabase/account/index.types";
 // import { Dispatch } from "react";
 // import { SetStateAction } from "react";
 import { useForm } from "react-hook-form";

@@ -1,9 +1,8 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { login } from "../../supabase/auth";
-import { useMutation } from "@tanstack/react-query";
+import { useLogIn } from "../../reactQuery/mutation/auth";
 
 interface LoginFormInputs {
   email: string;
@@ -12,7 +11,7 @@ interface LoginFormInputs {
 
 const LoginForm: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+
 
   const {
     register,
@@ -20,22 +19,20 @@ const LoginForm: React.FC = () => {
     formState: { errors },
   } = useForm<LoginFormInputs>();
 
-  const { mutate: handleLogIn, /*isError, error */ } = useMutation({
-    mutationKey: ["login"],
-    mutationFn: login,
-    onSuccess: () => {
-      navigate("/");
-    },
-  });
-
+  const { mutate: login, isError, error, isPending } = useLogIn();
+  
+ 
   const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
-    handleLogIn(data);
+    login(data);
   };
 
   return (
     <div className="w-fit min-h-screen bg-background flex items-center justify-center m-auto">
       <div className="rounded-xl border bg-card text-card-foreground shadow w-full max-w-md">
         <div className="flex flex-col space-y-1.5 p-6">
+        {isPending && (
+        <h1 className="m-auto text-center text-lg">Signing you in...</h1>
+      )}
           <div className="tracking-tight text-2xl font-bold text-center">
             {t("signin.title")}
           </div>
@@ -43,7 +40,7 @@ const LoginForm: React.FC = () => {
             {t("signin.description")}
           </div>
         </div>
-
+        
         <div className="p-6 pt-0">
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             {/* Email Field */}
@@ -111,6 +108,7 @@ const LoginForm: React.FC = () => {
             </button>
           </form>
         </div>
+        {isError && <p className="text-red-500">Login failed: {String(error)}</p>}
 
         <div className="items-center p-6 pt-0 flex justify-between">
           <a href="/forgot-password" className="text-sm text-primary hover:underline">

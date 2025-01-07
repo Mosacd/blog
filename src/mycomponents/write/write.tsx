@@ -1,16 +1,13 @@
 import { Controller, useForm } from "react-hook-form";
 import { Textarea } from "../../components/ui/textarea";
 import { Input } from "../../components/ui/input";
-import { supabase } from "../../supabase";
+// import { supabase } from "../../supabase";
 import { useAuthContext } from "../../context/auth/hooks/useAuthContext";
-import { useMutation } from "@tanstack/react-query";
+// import { useMutation } from "@tanstack/react-query";
+import { BlogValueTypes } from "./write";
+import { useCreatePost } from "../../reactQuery/mutation/blog";
 // import { Description } from "@radix-ui/react-dialog";
 
-type BlogValueTypes = {
-  title: string;
-  description: string;
-  image_file: null | File;
-};
 
 const BlogFormDefault = {
   title: "",
@@ -25,33 +22,45 @@ const WritePost = () => {
 
  const {user} = useAuthContext();
 
- const createPostMutation = useMutation(async (formData: BlogValueTypes) => {
-  let imageUrl = null;
+//  const createPostMutation = useMutation(async (formData: BlogValueTypes) => {
+//   let imageUrl = null;
 
-  if (formData?.image_file) {
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('blog_images')
-      .upload(formData.image_file.name, formData.image_file);
-    if (uploadError) {
-      throw new Error(uploadError.message);
-    }
-    imageUrl = uploadData?.path;
-  }
+//   if (formData?.image_file) {
+//     const { data: uploadData, error: uploadError } = await supabase.storage
+//       .from('blog_images')
+//       .upload(formData.image_file.name, formData.image_file);
+//     if (uploadError) {
+//       throw new Error(uploadError.message);
+//     }
+//     imageUrl = uploadData?.path;
+//   }
 
-  const { error: insertError } = await supabase.from('blogs').insert({
-    title: formData.title,
-    description: formData.description,
-    image_url: imageUrl,
-    user_id: user?.user?.id,
-  });
-  if (insertError) {
-    throw new Error(insertError.message);
-  }
-});
+//   const { error: insertError } = await supabase.from('blogs').insert({
+//     title: formData.title,
+//     description: formData.description,
+//     image_url: imageUrl,
+//     user_id: user?.user?.id,
+//   });
+//   if (insertError) {
+//     throw new Error(insertError.message);
+//   }
+// });
+
+// const onSubmit = async (formData: BlogValueTypes) => {
+//   try {
+//     await createPostMutation.mutateAsync(formData);
+//     console.log('Blog post successfully created!');
+//   } catch (error) {
+//     console.error('Error creating blog post:', error);
+//   }
+// };
+
+
+const { mutateAsync: createPostMutation } = useCreatePost(user?.user?.id);
 
 const onSubmit = async (formData: BlogValueTypes) => {
   try {
-    await createPostMutation.mutateAsync(formData);
+    await createPostMutation(formData);
     console.log('Blog post successfully created!');
   } catch (error) {
     console.error('Error creating blog post:', error);

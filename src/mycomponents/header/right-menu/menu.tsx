@@ -5,10 +5,9 @@ import { ComboboxDemo } from '../../../components/ui/combobox';
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 import { useAuthContext } from '../../../context/auth/hooks/useAuthContext';
-import { useMutation } from '@tanstack/react-query';
-import { logout } from '../../../supabase/auth/index';
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
 import { AvatarFallback } from '../../../components/ui/avatar';
+import { useSignOut } from '../../../reactQuery/mutation/auth';
 const Menu: React.FC = () =>{
   const { t } = useTranslation();
   
@@ -18,7 +17,15 @@ const handleChangeLanguage = (lang:string) => {
 }
 const {user,avatar} = useAuthContext();
 
-const{mutate:handleLogout} = useMutation({mutationKey:['logout'], mutationFn:logout})
+
+const { mutate: logout } = useSignOut();
+
+const handleLogout = () => {
+  logout();
+};
+
+// const{mutate:handleLogout} = useMutation({mutationKey:['logout'], mutationFn:logout})
+
     return(
         <div className='flex gap-3 '>
           {user ?(<>
@@ -29,7 +36,7 @@ const{mutate:handleLogout} = useMutation({mutationKey:['logout'], mutationFn:log
                 </Avatar>
                 </Link>
        
-              <button onClick={() => handleLogout()} className='bg-blue-600 text-white'>Logout</button>
+              <button onClick={handleLogout} className='bg-blue-600 text-white'>Logout</button>
               </>
           )
           :(
